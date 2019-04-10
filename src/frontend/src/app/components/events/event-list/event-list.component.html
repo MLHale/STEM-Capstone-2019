@@ -3,7 +3,7 @@
   <p class="date">{{ date | date:'longDate' }}</p>
   <img src="{{imageSource}}">
   <mat-chip-list class="container">
-    <mat-chip *ngFor="let tag of tags">{{ tag.toString() | lowercase }}</mat-chip>
+    <mat-chip *ngFor="let tag of tags">{{ tag.name | lowercase }}</mat-chip>
   </mat-chip-list>
   <!--<button mat-button>LIKE</button>-->
 </mat-card>

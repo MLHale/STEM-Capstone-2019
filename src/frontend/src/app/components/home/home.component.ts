@@ -12,9 +12,8 @@ export class HomeComponent implements OnInit {
 
   constructor(private eventService: EventService) { }
   events: Event[];
-  categories: Tag[];
+  categories: String[];
 
-  tevents: Event[];
   mySlideOptions={dots: false, nav: true};
 
   ngOnInit() {
@@ -23,11 +22,16 @@ export class HomeComponent implements OnInit {
 
   }
 
-  getEveByCat(cat: Tag): Event[]
+  getEveByCat(cat: String): Event[]
   {
-    this.tevents=[];
-    this.events.forEach(event => { if(event.tags.includes(cat)) this.tevents.push(event)  });
-    return this.tevents;
+    
+    //var tevents = this.events.filter(event => event.tags.filter(tag => tag.name == "Math").length > 0);
+    var tevents : Event[] = [];
+    this.events.forEach(event => { if(event.tags.filter(tag =>tag.name == cat).length > 0) tevents.push(event)  });
+    console.log(this.categories);
+
+    return tevents;
+
   }
 
   getEvents(): void {
@@ -38,7 +42,8 @@ export class HomeComponent implements OnInit {
       this.events = events;
       this.events.forEach(event => {
         event.tags.forEach( tag => {
-          if(!this.categories.includes(tag)) { this.categories.push(tag) }; 
+          if(!this.categories.includes(tag.name)) { this.categories.push(tag.name) }; 
+          console.log(this.categories);
         });
       
       });
