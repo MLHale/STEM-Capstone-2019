@@ -1,11 +1,11 @@
 <div class="container">
-  <div *ngFor="let cat of categories">
+  <div *ngFor="let carousel of eventCarousels">
     <div class="tag">
-      <h5>{{cat}}</h5><br>
+      <h5>{{carousel.name}}</h5><br>
     </div>
 
     <owl-carousel [options]="mySlideOptions" [carouselClasses]="['owl-theme', 'sliding']">
-      <div *ngFor="let event of getEveByCat(cat)">
+      <div *ngFor="let event of carousel.events">
         <app-event-list [name]="event.name" [date]="event.date" [event_type]="event.event_type" [tags]="event.tags">
         </app-event-list>
       </div>
