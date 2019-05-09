@@ -13,12 +13,12 @@ class Event(models.Model):
     name = models.CharField(max_length=200)
     date = models.DateField()
     e_type = models.PositiveSmallIntegerField(choices=EVENT_TYPE_CHOICES, default=1)
-    address = models.CharField(max_length=200)
+    address = models.CharField(max_length=200, blank=True, null=True)
     organizer = models.ForeignKey(User, on_delete=models.CASCADE)
     attendees = models.ManyToManyField(User, related_name="events", blank=True)
     lower_age_range = models.PositiveSmallIntegerField(blank=True, null=True, validators=[MaxValueValidator(125),])
     higher_age_range = models.PositiveSmallIntegerField(blank=True, null=True, validators=[MaxValueValidator(125),])
-    tags = models.ManyToManyField(Tag, related_name="tags", blank=True)
+    tags = models.ManyToManyField(Tag, related_name="events", blank=True)
 
     objects = EventManager()
 

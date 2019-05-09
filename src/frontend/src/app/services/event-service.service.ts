@@ -4,6 +4,7 @@ import { Observable, of, throwError } from 'rxjs';
 import { catchError, tap, retry } from 'rxjs/operators';
 import { Event } from '../models/event';
 import { Cacheable } from 'ngx-cacheable';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,7 @@ export class EventService {
   private user: any;
 
   constructor(private http: HttpClient) {
-    this.eventApiUrl = 'http://localhost:8000/api/v1/events/';
-    this.user;
+    this.eventApiUrl = environment.eventsApiUrl;
   }
 
   @Cacheable()
@@ -25,14 +25,14 @@ export class EventService {
   @Cacheable()
   search(searchTerm: string): Observable<Event[]> {
     return this.http.get<Event[]>(`/api/v1/events/search/${searchTerm}`);
-  } 
+  }
 
-  addEvent(eventName: string, eventDate: Date, eventType: string): Observable<Event> {
+  addEvent(eventName: string, eventDate: Date, eventType: string, eventTags: string[]): Observable<Event> {
     const obj = {
       name: eventName,
       date: eventDate.toLocaleDateString('en-US'),
       event_type: eventType,
-      tags: []
+      tags: eventTags
     };
 
     var user = JSON.parse(localStorage.currentUser);

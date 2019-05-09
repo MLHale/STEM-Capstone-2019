@@ -24,7 +24,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ['STEM_SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if 'DOCKER_PROD_FLAG' in os.environ:
+    DEBUG = False
+else:
+    DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -47,7 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'app',
+    'app.apps.AppConfig',
 ]
 
 MIDDLEWARE = [
@@ -152,6 +155,9 @@ REST_FRAMEWORK = {
     ),
 }
 
+LOCKOUT_ON_FAILURE = True
+LOCKOUT_MAX_ATTEMPTS = 3
+LOCKOUT_TIME = 120
 
 JWT_AUTH = {
     'JWT_ALLOW_REFRESH': True,

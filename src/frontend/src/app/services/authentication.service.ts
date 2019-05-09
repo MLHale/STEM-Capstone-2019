@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 import { UserLogin } from '../models/userlogin';
 import { RegisterUser } from '../models/registeruser';
 
@@ -16,8 +17,8 @@ export class AuthenticationService {
   constructor(private http: HttpClient, private router: Router) {
     this.currentUserSubject = new BehaviorSubject<UserLogin>(JSON.parse(localStorage.getItem('currentUser')));
     this.currentUser = this.currentUserSubject.asObservable();
-    this.apiLoginUrl = 'http://localhost:8000/api/login/';
-    this.apiRegisterUrl = 'http://localhost:8000/api/v1/users/';
+    this.apiLoginUrl = environment.loginApiUrl;
+    this.apiRegisterUrl = environment.usersApiUrl;
   }
 
   public get currentUserValue(): UserLogin {
@@ -34,8 +35,13 @@ export class AuthenticationService {
     return tokenDecoded.user_type;
   }
 
+  public get approvedToPostEvents(): boolean {
+    const tokenDecoded = JSON.parse(window.atob(this.currentUserSubject.value.token.split(/\./)[1]));
+    return tokenDecoded.approved_to_post_events;
+  }
+
   login(email: string, password: string) {
-    return this.http.post<any>(`${this.apiLoginUrl}`, { email, password })
+    return this.http.post<any>(`${this.apiLoginUrl}`, { email: email, password })
       .pipe(map(user => {
         // login successful if there's a jwt token in the response
         if (user && user.token) {
@@ -89,7 +95,7 @@ export class AuthenticationService {
 
     if (organization !== '') {
       registerUser.user_type = 3;
-    } else if (parentId){
+    } else if (parentId) {
       registerUser.user_type = 1;
     } else {
       registerUser.user_type = 2;

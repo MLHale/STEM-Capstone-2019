@@ -8,6 +8,8 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { SearchTermChangeService } from 'src/app/services/search-term-change.service';
 import { trigger, style, animate, transition } from '@angular/animations';
+import { environment } from 'src/environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-header',
@@ -32,6 +34,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   currentUser: UserLogin;
   topPosition: MatSnackBarVerticalPosition = 'top';
   rightPosition: MatSnackBarHorizontalPosition = 'right';
+  userType: number;
+  approvedToPostEvents: boolean;
 
   private unsubscribe = new Subject<void>();
   eventSearchTerm: Subject<string> = new Subject<string>();
@@ -44,8 +48,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   constructor(private router: Router, private authenticationService: AuthenticationService,
               private dialog: MatDialog, private snackBar: MatSnackBar,
-              private searchTermChangeService: SearchTermChangeService) {
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+              private searchTermChangeService: SearchTermChangeService, private http: HttpClient) {
+    this.authenticationService.currentUser.subscribe(x => 
+      { 
+        this.currentUser = x;  
+        if(localStorage.getItem('currentUser') != null)
+        {
+          this.http.post<any>(`${environment.refreshApiUrl}`, { token : JSON.parse(localStorage.getItem('currentUser')).token });
+        }
+      });
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         if (event.url.includes('/events/search')) {
@@ -60,7 +71,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
+    this.userType = this.authenticationService.userType;
+    this.approvedToPostEvents = this.authenticationService.approvedToPostEvents;
     this.eventSearchTerm.pipe(
       takeUntil(this.unsubscribe)
     ).subscribe((searchTerm) => {

@@ -2,7 +2,9 @@ import { Component, OnInit, Inject } from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {FormBuilder, Validators, FormGroup} from '@angular/forms';
 import { User } from '../../../models/user';
+import { Tag } from '../../../models/tag';
 import { UserService } from 'src/app/services/user.service';
+import { TagService } from '../../../services/tag.service';
 import { MatSnackBar, MatSnackBarVerticalPosition, MatSnackBarHorizontalPosition } from '@angular/material';
 import { first } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -16,12 +18,14 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 export class ProfileUpdateComponent implements OnInit {
   updateForm: FormGroup;
   user: User;
+  tags: Tag[];
   error = '';
   topPosition: MatSnackBarVerticalPosition = 'top';
   centerPosition: MatSnackBarHorizontalPosition = 'center';
 
   constructor(
     private authenticationService: AuthenticationService,
+    private tagService: TagService,
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<ProfileUpdateComponent>,
     @Inject(MAT_DIALOG_DATA) data,
@@ -46,7 +50,9 @@ export class ProfileUpdateComponent implements OnInit {
         city: [this.user.city],
         state: [this.user.state],
         zip: [this.user.zip_code, [Validators.pattern(this.zipPattern)]],
+        interests: [this.user.interests]
       });
+    this.getTags();
   }
 
   onSubmit() {
@@ -60,7 +66,8 @@ export class ProfileUpdateComponent implements OnInit {
       address: this.updateForm.get('address').value,
       city: this.updateForm.get('city').value,
       state: this.updateForm.get('state').value,
-      zip_code: this.updateForm.get('zip').value
+      zip_code: this.updateForm.get('zip').value,
+      interests: this.updateForm.get('interests').value
     };
 
     this.userService.updateUser(userId, userObject)
@@ -110,5 +117,11 @@ export class ProfileUpdateComponent implements OnInit {
         : '';
     }
 
+  getTags() {
+    this.tagService.getTags()
+    .subscribe(tags => {
+      this.tags = tags;
+    });
+  }
 }
 
